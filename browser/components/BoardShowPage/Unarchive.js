@@ -32,11 +32,6 @@ export default class Unarchive extends Component {
       .filter(card => card.archived)
       .filter(card => `${card.description} ${card.content}`.toUpperCase().indexOf(this.state.searchTerm.toUpperCase()) >= 0)
       .sort((a, b) => a.order - b.order)
-  
-    const lists = board.lists
-      .filter(list => list.archived)
-      .filter(list => list.name.toUpperCase().indexOf(this.state.searchTerm.ToUpperCase))
-      .sort((a, b) => a.board_id - b.board_id)
     const cardNodes = cards.map((card, index) =>
       <div key={card.id}>
         <Card
@@ -58,10 +53,71 @@ export default class Unarchive extends Component {
         onChange={this.setSearchTerm}
       />
     </Form>
-      {cardNodes}
+      <ArchivedCards board={board} searchTerm={this.state.searchTerm} />
       <ArchivedLists board={board} searchTerm={this.state.searchTerm} />
   </div>
   )
+  }
+}
+
+class ArchivedCards extends Component {
+
+  static PropTypes = {
+    searchTerm: React.PropTypes.string.isRequired,
+    board: React.PropTypes.object.isRequired
+  }
+
+  constructor(props){
+    super(props)
+    this.unArchiveCard = this.unArchiveCard.bind(this)
+    this.deleteCard = this.deleteCard.bind(this)
+  }
+
+  unArchiveCard(id){
+    $.ajax({
+      method: "POST",
+      url: `/api/cards/${id}/unarchive`
+    }).then(() => {
+      boardStore.reload()
+    })
+  }
+
+  deleteCard(id){
+    $.ajax({
+      method: "POST",
+      url: `/api/cards/${id}/delete`
+    }).then(() => {
+      boardStore.reload()
+    })
+  }
+
+  render(){
+    const cards = this.props.board.cards
+      .filter(card => card.archived)
+      .filter(card => `${card.description} ${card.content}`.toUpperCase().indexOf(this.props.searchTerm.toUpperCase()) >= 0)
+      .sort((a, b) => a.order - b.order)
+
+    const cardNodes = cards.map((card, index) =>
+      <div key={card.id}>
+        <Card
+          key={card.id}
+          card={card}
+          index={index}
+        />
+        <Link onClick={()=> this.unArchiveCard(card.id)}>"Send to Board"</Link> 
+        <ConfirmationLink
+          onConfirm={()=> this.deleteCard(card.id)}
+          buttonName="Delete"
+          title='Delete Card?'
+          message='All actions will be removed from the activity feed and you won’t be able to re-open the card. There is no undo.'
+        >Delete</ConfirmationLink>
+      </div>
+    )
+
+    return(<div className="archivedCards">
+      {cardNodes}
+    </div>
+    )
   }
 }
 
