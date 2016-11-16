@@ -26,7 +26,7 @@ router.post('/:cardId/archive', (request, response, next) => {
     .catch(next)
 })
 
-// ARCHIVE
+// UNARCHIVE
 router.post('/:cardId/unarchive', (request, response, next) => {
   commands.unarchiveCard(request.params.cardId)
     .then(() => {
@@ -37,6 +37,7 @@ router.post('/:cardId/unarchive', (request, response, next) => {
 
 // DELETE
 router.post('/:cardId/delete', (request, response, next) => {
+  console.log("Delete API")
   commands.deleteCard(request.params.cardId)
     .then(() => {
       response.json(null)

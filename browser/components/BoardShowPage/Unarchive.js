@@ -3,6 +3,8 @@ import boardStore from '../../stores/boardStore'
 import $ from 'jquery'
 import Card from './Card'
 import Link from '../Link'
+import ConfirmationLink from '../ConfirmationLink'
+
 
 export default class Unarchive extends Component {
   static PropTypes = {
@@ -18,34 +20,32 @@ export default class Unarchive extends Component {
       .filter(list => list.archived)
       .sort((a, b) => a.board_id - b.board_id)
     const cardNodes = cards.map((card, index) =>
-      <Card
-        key={card.id}
-        card={card}
-        index={index}
-      />      
+      <div key={card.id}>
+        <Card
+          key={card.id}
+          card={card}
+          index={index}
+        />
+        <ArchivedCardActions card={card} />
+      </div>
     )
 
-    return (
-      cardNodes
-      ) 
+    return (<div className="cardsList">
+      {cardNodes}
+    </div>
+  )
   }
 }
 
-class ArchivedCard extends Component {
-  static PropTypes = {
+class ArchivedCardActions extends Component {
+  static propTypes = {
     card: React.PropTypes.object.isRequired
   }
 
-}
-
-class ArchivedCardAction extends Component {
-  static propTypes = {
-    card: React.PropTypes.object.isRequired,
-    onArchive: React.PropTypes.func.isRequired,
-  }
   constructor(props){
     super(props)
-    this.archiveCard = this.archiveCard.bind(this)
+    this.unArchiveCard = this.unArchiveCard.bind(this)
+    this.deleteCard = this.deleteCard.bind(this)
   }
   unArchiveCard(){
     $.ajax({
@@ -64,9 +64,15 @@ class ArchivedCardAction extends Component {
     })
   }
   render(){
-    return <div className= "acti">
+    return <div className= "archivedCardActions">
     <Link onClick={this.unArchiveCard}>"Send to Board"</Link>
-    <Link onClick={this.delete}>"Delete"</Link>
+
+    <ConfirmationLink
+      onConfirm={this.deleteCard}
+      buttonName="Delete"
+      title='Delete Card?'
+      message='All actions will be removed from the activity feed and you won’t be able to re-open the card. There is no undo.'
+    >Delete</ConfirmationLink>
     </div>
   }
 }
