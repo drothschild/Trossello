@@ -10,52 +10,51 @@ import Button from '../Button'
 
 
 export default class Unarchive extends Component {
+
   static PropTypes = {
     board: React.PropTypes.object.isRequired
   }
+
   constructor(props){
     super(props)
     this.state = {
-      searchTerm: ''
+      searchTerm: '',
+      display: 'Cards'
     }
     this.setSearchTerm = this.setSearchTerm.bind(this)
+    this.toggleDisplay = this.toggleDisplay.bind(this)
   }
 
   setSearchTerm(event){
     const searchTerm = event.target.value
-    this.setState({searchTerm})
+    this.setState({searchTerm: searchTerm})
+  }
+
+  toggleDisplay(){
+    const display = this.state.display === 'Cards' ? 'Lists' : 'Cards'
+    this.setState( {
+      display: display
+    })
   }
 
   render(){
     const { board } = this.props
-    const cards = board.cards
-      .filter(card => card.archived)
-      .filter(card => `${card.description} ${card.content}`.toUpperCase().indexOf(this.state.searchTerm.toUpperCase()) >= 0)
-      .sort((a, b) => a.order - b.order)
-    const cardNodes = cards.map((card, index) =>
-      <div key={card.id}>
-        <Card
-          key={card.id}
-          card={card}
-          index={index}
-        />
-        <ArchivedCardActions card={card} />
-      </div>
-    )
-
-    return (<div className="unarchive">
-      <Form className="ArchiveSearchForm">
-      <input
-        type="text"
-        className="ArchiveSearchForm-Input"
-        ref="content"
-        value={this.state.searchTerm}
-        onChange={this.setSearchTerm}
-      />
-    </Form>
-      <ArchivedCards board={board} searchTerm={this.state.searchTerm} />
+    const toggleButtonText = this.state.display === 'Cards' ? 'Show Lists':"Show Cards"
+    const toggleDisplayStatus = this.state.display === 'Cards' ?
+      <ArchivedCards board={board} searchTerm={this.state.searchTerm} /> :
       <ArchivedLists board={board} searchTerm={this.state.searchTerm} />
-  </div>
+    return (<div className="Unarchive">
+      <Form className="ArchiveSearchForm">
+        <input
+          type="text"
+          className="ArchiveSearchForm-Input"
+          value={this.state.searchTerm}
+          onChange={this.setSearchTerm}
+        />
+      </Form>
+      <Link onClick={this.toggleDisplay}>{toggleButtonText}</Link> 
+      {toggleDisplayStatus}
+    </div>
   )
   }
 }
@@ -158,44 +157,4 @@ class ArchivedLists extends Component {
       </div>
       )
    }
-}
-
-class ArchivedCardActions extends Component {
-  static propTypes = {
-    card: React.PropTypes.object.isRequired
-  }
-
-  constructor(props){
-    super(props)
-    this.unArchiveCard = this.unArchiveCard.bind(this)
-    this.deleteCard = this.deleteCard.bind(this)
-  }
-  unArchiveCard(){
-    $.ajax({
-      method: "POST",
-      url: `/api/cards/${this.props.card.id}/unarchive`
-    }).then(() => {
-      boardStore.reload()
-    })
-  }
-  deleteCard(){
-    $.ajax({
-      method: "POST",
-      url: `/api/cards/${this.props.card.id}/delete`
-    }).then(() => {
-      boardStore.reload()
-    })
-  }
-  render(){
-    return <div className= "archivedCardActions">
-    <Link onClick={this.unArchiveCard}>"Send to Board"</Link>
-
-    <ConfirmationLink
-      onConfirm={this.deleteCard}
-      buttonName="Delete"
-      title='Delete Card?'
-      message='All actions will be removed from the activity feed and you won’t be able to re-open the card. There is no undo.'
-    >Delete</ConfirmationLink>
-    </div>
-  }
 }
