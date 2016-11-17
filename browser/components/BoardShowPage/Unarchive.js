@@ -39,18 +39,20 @@ export default class Unarchive extends Component {
 
   render(){
     const { board } = this.props
-    const toggleButtonText = this.state.display === 'Cards' ? 'Show Lists':"Show Cards"
+    const toggleButtonText = this.state.display === 'Cards' ? 'Switch to lists':"Switch to cards"
     const toggleDisplayStatus = this.state.display === 'Cards' ?
-      <ArchivedCards board={board} searchTerm={this.state.searchTerm} /> :
-      <ArchivedLists board={board} searchTerm={this.state.searchTerm} />
-    return (<div className="Unarchive">
-        <input
+      <ArchivedCards board={board} searchTerm={this.state.searchTerm} className="BoardShowPage-MenuSideBar-ArchivedItems-List" /> :
+      <ArchivedLists board={board} searchTerm={this.state.searchTerm} className="BoardShowPage-MenuSideBar-ArchivedItems-List"/>
+    return (<div className="BoardShowPage-MenuSideBar-ArchivedItems">
+        <span className="BoardShowPage-MenuSideBar-ArchivedItems-Header" > <input
           type="text"
-          className="ArchiveSearchForm-Input"
+          className="BoardShowPage-MenuSideBar-ArchivedItems-SearchBox"
+          placeholder="Search archive..."
           value={this.state.searchTerm}
           onChange={this.setSearchTerm}
         />
-      <Link onClick={this.toggleDisplay}>{toggleButtonText}</Link> 
+      <Link onClick={this.toggleDisplay} className="BoardShowPage-MenuSideBar-ArchivedItems-ToggleDisplay">{toggleButtonText}</Link> 
+      </span>
       {toggleDisplayStatus}
     </div>
   )
@@ -101,10 +103,11 @@ class ArchivedCards extends Component {
           card={card}
           index={index}
         />
-        <Link onClick={()=> this.unArchiveCard(card.id)}>"Send to Board"</Link> 
+        <Link onClick={()=> this.unArchiveCard(card.id)} className="BoardShowPage-MenuSideBar-ArchivedItems-UnarchiveButton">Send to Board</Link>-
         <ConfirmationLink
           onConfirm={()=> this.deleteCard(card.id)}
           buttonName="Delete"
+          className="BoardShowPage-MenuSideBar-ArchivedItems-UnarchiveButton"
           title='Delete Card?'
           message='All actions will be removed from the activity feed and you won’t be able to re-open the card. There is no undo.'
         >Delete</ConfirmationLink>
@@ -146,7 +149,7 @@ class ArchivedLists extends Component {
         .sort((a, b) => a.name - b.name)
     const listNodes = lists.map((list, index) =>
         <div key={list.id}> {list.name}
-        <Button onClick={()=> this.unArchiveList(list.id)}>Send to Board</Button>
+        <Button onClick={()=> this.unArchiveList(list.id)} className="BoardShowPage-MenuSideBar-ArchivedItems-UnarchiveButton">Send to Board</Button>
         </div>
       )
 

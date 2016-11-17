@@ -104,6 +104,9 @@ export default class Card extends Component {
       null
 
     let className = 'BoardShowPage-Card'
+    const archivedFooter= card.archived ? 
+     <div><Icon type="archive" /> Archived</div> :
+      null
     if (ghosted) className += ' BoardShowPage-Card-ghosted'
     if (beingDragged) className += ' BoardShowPage-Card-beingDragged'
 
@@ -122,6 +125,7 @@ export default class Card extends Component {
         onClick={this.openShowCardModal}
       >
         <pre>{card.content}</pre>
+        {archivedFooter}
       </Link>
       <div className="BoardShowPage-Card-controls">
         {editCardButton}

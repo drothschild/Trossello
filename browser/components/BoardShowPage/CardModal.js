@@ -40,17 +40,17 @@ export default class CardModal extends Component {
   render(){
     const { session } = this.context
     const { card, list } = this.props
-    const archivedHeader = card.archived?
-      <div className='CardModal-content-archived'>This card is archived</div>:
+    const archivedBanner = card.archived?
+      <div className='CardModal-window-archivedBanner'> <Icon type="archive" /> This card is archived</div>:
       null
     return <div className="CardModal">
       <div onClick={this.props.onClose} className="CardModal-shroud">
       </div>
       <div className="CardModal-stage">
         <div className="CardModal-window">
+          {archivedBanner}
           <div className="CardModal-body">
             <div className="CardModal-content">
-              {archivedHeader}
               <div className="CardModal-content-icon">
                 <Icon type="window-maximize" size='2'/>
               </div>
