@@ -40,7 +40,9 @@ export default class CardModal extends Component {
   render(){
     const { session } = this.context
     const { card, list } = this.props
-
+    const archivedHeader = card.archived?
+      <div className='CardModal-content-archived'>This card is archived</div>:
+      null
     return <div className="CardModal">
       <div onClick={this.props.onClose} className="CardModal-shroud">
       </div>
@@ -48,6 +50,7 @@ export default class CardModal extends Component {
         <div className="CardModal-window">
           <div className="CardModal-body">
             <div className="CardModal-content">
+              {archivedHeader}
               <div className="CardModal-content-icon">
                 <Icon type="window-maximize" size='2'/>
               </div>
@@ -102,12 +105,74 @@ export default class CardModal extends Component {
 }
 
 const Controls = ({card, closeModal}) => {
+  const toggleOnArchived = card.archived ?
+  <div>
+    <UnArchiveCardButton card={card} />
+    <DeleteCardButton card={card} onDelete={closeModal} />
+  </div> :
+  <ArchiveCardButton card={card} onArchive={closeModal}/>
   return <div className="CardModal-controls">
     <div className="CardModal-controls-title">Add</div>
     <Button><Icon type="user" /> Members</Button>
     <div className="CardModal-controls-title">Actions</div>
-    <ArchiveCardButton card={card} onArchive={closeModal}/>
+    {toggleOnArchived}
   </div>
+}
+
+class DeleteCardButton extends Component {
+  static propTypes = {
+    card: React.PropTypes.object.isRequired,
+    onDelete: React.PropTypes.func.isRequired,
+  }
+  constructor(props){
+    super(props)
+    this.delete = this.delete.bind(this)
+  }
+  delete(){
+    $.ajax({
+      method: "POST",
+      url: `/api/cards/${this.props.card.id}/delete`
+    }).then(() => {
+      boardStore.reload()
+      this.props.onDelete()
+    })
+  }
+  render(){
+    return <ConfirmationButton
+      onConfirm={this.delete}
+      buttonName='Delete'
+      title='Delete Card?'
+      message='All actions will be removed from the activity feed and you won’t be able to re-open the card. There is no undo.'
+      className='CardModal-controls-delete'
+    >
+      <Icon type="trash" /> Delete
+    </ConfirmationButton>
+  }
+}
+
+class UnArchiveCardButton extends Component {
+  static propTypes = {
+    card: React.PropTypes.object.isRequired
+  }
+  constructor(props){
+    super(props)
+    this.unArchive = this.unArchive.bind(this)
+  }
+  unArchive(){
+    $.ajax({
+      method: "POST",
+      url: `/api/cards/${this.props.card.id}/unarchive`
+    }).then(() => {
+      boardStore.reload()
+    })
+  }
+  render(){
+    return <Button
+      onClick={this.unArchive}
+    >
+      <Icon type="refresh" /> Return to Board
+    </Button>
+  }
 }
 
 class ArchiveCardButton extends Component {

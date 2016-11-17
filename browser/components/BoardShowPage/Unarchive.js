@@ -44,14 +44,12 @@ export default class Unarchive extends Component {
       <ArchivedCards board={board} searchTerm={this.state.searchTerm} /> :
       <ArchivedLists board={board} searchTerm={this.state.searchTerm} />
     return (<div className="Unarchive">
-      <Form className="ArchiveSearchForm">
         <input
           type="text"
           className="ArchiveSearchForm-Input"
           value={this.state.searchTerm}
           onChange={this.setSearchTerm}
         />
-      </Form>
       <Link onClick={this.toggleDisplay}>{toggleButtonText}</Link> 
       {toggleDisplayStatus}
     </div>
@@ -121,6 +119,7 @@ class ArchivedCards extends Component {
 }
 
 class ArchivedLists extends Component {
+  
   static propTypes = {
     searchTerm: React.PropTypes.string,
     board: React.PropTypes.object.isRequired
@@ -146,8 +145,8 @@ class ArchivedLists extends Component {
         .filter(list => list.name.toUpperCase().indexOf(this.props.searchTerm.ToUpperCase))
         .sort((a, b) => a.name - b.name)
     const listNodes = lists.map((list, index) =>
-        <div key={list.id}> "{list.name}"
-        <Link onClick={()=> this.unArchiveList(list.id)}>"Send to Board"</Link>
+        <div key={list.id}> {list.name}
+        <Button onClick={()=> this.unArchiveList(list.id)}>Send to Board</Button>
         </div>
       )
 
